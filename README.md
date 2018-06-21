@@ -1,7 +1,7 @@
 # firebase
 Exploiting misconfigured [Firebase](https://firebase.google.com/) databases
 
-## Disclaimer: The provided software is meant for educational purposes only. Use this at your own discretion, the creator cannot be held responsible for any damages caused. Please, use responsibly.
+## Disclaimer: The provided software is meant for educational purposes only. Use this at your own discretion, the creator cannot be held responsible for any damages caused. Please, use responsibly!
 
 ### Prerequisites
 Non-standard python modules:
@@ -22,4 +22,4 @@ For a better results head to [pentest-tools.com](https://pentest-tools.com/infor
 
 ### Credits
 
-This script is heavily based in the work by the Mobile Threat Team from [appthority](https://www.appthority.com/mobile-threat-center/blog/appthority-discovers-thousands-of-apps-with-firebase-vulnerability-exposing-sensitive-data/). All credits for the reasearch belong to them.
+This script is heavily based on the work by the Mobile Threat Team from [appthority](https://www.appthority.com/mobile-threat-center/blog/appthority-discovers-thousands-of-apps-with-firebase-vulnerability-exposing-sensitive-data/). All credits for the reasearch belong to them.
