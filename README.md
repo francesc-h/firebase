@@ -9,6 +9,12 @@ Non-standard python modules:
 * [bs4](http://beautiful-soup-4.readthedocs.io/en/latest/)
 * [requests](https://github.com/requests/requests)
 
+### Installation
+If the following command runs successfully, you are ready to use the script:
+```
+pip install -r requirements.txt
+```
+
 ### Usage
 ```
 python3 firebase.py [-h] [--dnsdumpster] [-d /path/to/file.htm] [-f results.json] [-l /path/to/file] [-c 100] [-p 4]
@@ -34,6 +40,15 @@ The script will create a json file containing the gathered vulnerable databases 
 *  1: vulnerable
 
 For a better results head to [pentest-tools.com](https://pentest-tools.com/information-gathering/find-subdomains-of-domain) and in its subdomain scanner introduce the following domain: ```firebaseio.com```. Once the scan has finished, save the page HTML(CRL+S) and use the ```-d [path]``` argument, this will allow the script to analyze the subdomains discovered by that service. Further subdomain crawlers might get supported.
+
+Firebase DBs work using this structure: ```https://[DB name].firebaseio.com/```. If you are using the ```-l [path]``` argument, the supplied file needs to contain a [DB name] per line, for example:
+```
+airbnb
+twitter
+microsoft
+```
+
+Using that file will check for these DBs: ```https://airbnb.firebaseio.com, https://twitter.firebaseio.com, https://microsoft.firebaseio.com```
 
 ### Credits
 
