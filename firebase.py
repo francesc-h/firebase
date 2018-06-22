@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
 
 
-    print('Saving results to results.json\n')
+    print('Saving results to {}\n'.format(args_.fn)
     with open(args_.fn, 'w') as f:
         json.dump(loot, f)
 
