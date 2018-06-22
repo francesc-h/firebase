@@ -24,6 +24,9 @@ Arguments:
     --dnsdumpster       Use the DNSDumpster API to gather DBs
 ```
 
+Example:
+``` python3 firebase.py -p 4 -f results_1.json -c 150 --dnsdumpster``` This will lookup the first 150 domains in the Alexa file aswell as the DBs provided by DNSDumpster. The results will be saved to ```results_1.json``` and the whole script will execute using 4 parallel processes
+
 The script will create a json file containing the gathered vulnerable databases and their dumped contents. Each database has a status:
 * -2: DB doesn't exists
 * -1: means it's not vulnerable
