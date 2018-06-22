@@ -1,8 +1,5 @@
-from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
 from argparse import ArgumentParser
 from multiprocessing import Pool
-from bs4 import BeautifulSoup
-from subprocess import Popen
 from time import sleep
 import requests
 import os.path
@@ -67,6 +64,8 @@ def load_file():
     Parse the HTML file with the results of the pentest-tools subdomains scanner.
     '''
     try:
+        from bs4 import BeautifulSoup
+
         with open(args_.path, 'r') as f:
             print('Gathering subdomains through the downloaded file...')
             s = BeautifulSoup(f.read(), 'html.parser')
@@ -84,8 +83,9 @@ def down_tops():
     Credits for the script to @evilpacket
     https://gist.github.com/evilpacket/3628941
     '''
+    from subprocess import Popen
     command = "wget -q http://s3.amazonaws.com/alexa-static/top-1m.csv.zip;unzip top-1m.csv.zip; awk -F ',' '{print $2}' top-1m.csv|head -"+str(args_.crawl_top)+" > top-"+str(args_.crawl_top)+".txt; rm top-1m.csv*"
-
+    
     try:
         Popen(command, shell=True).wait()
     except Exception:
@@ -115,6 +115,8 @@ if __name__ == '__main__':
     if not args_.list:
         domains = []
         if args_.dnsdumpster:
+            from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
+
             print('Gathering subdomains using DNSDumpster...')
             results = DNSDumpsterAPI().search('firebaseio.com')
             domains.extend([domain['domain'] for domain in results['dns_records']['host']])
