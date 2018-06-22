@@ -10,8 +10,10 @@ Non-standard python modules:
 * [requests](https://github.com/requests/requests)
 
 ### Installation
-If the following command runs successfully, you are ready to use the script:
+If the following commands run successfully, you are ready to use the script:
 ```
+git clone https://github.com/Turr0n/firebase.git
+cd firebase
 pip install -r requirements.txt
 ```
 
