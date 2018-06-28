@@ -112,10 +112,10 @@ def tops():
         down_tops()
 
     print('Retrieving {} top domains'.format(args_.crawl_top))
-    with open('top-{}.txt'.format(args_.crawl_top), 'r') as f:
+    with open(fn, 'r') as f:
         [top_doms.add(line.split('.')[0]) for line in f]
+    
     top_doms = ['https://{}.firebaseio.com/.json'.format(dom) for dom in top_doms]
-
     return top_doms
 
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
             [urls.add('https://{}.firebaseio.com/.json'.format(line.rstrip())) for line in f]
         
         p = Pool(args_.process)
-        loot = list(p.map(worker, list(urls)))
+        loot = [result for result in list(p.map(worker, urls)) if result != None]
 
 
 
