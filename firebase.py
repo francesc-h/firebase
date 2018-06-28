@@ -4,6 +4,7 @@ from time import sleep
 import requests
 import os.path
 import json
+import sys
 
 def args():
     parser = ArgumentParser()
@@ -11,10 +12,17 @@ def args():
 
     group.add_argument('-c', dest='crawl_top', required=False, default=False, type=int, help='Crawl for domains in the top-1m by Alexa. Set how many domains to crawl, for example: 100. Up to 1000000')
     group.add_argument('-l', dest='list', required=False, default=False, help='Path to a file containing the DBs names to be checked. One per file')
-    parser.add_argument('-f', dest='fn', required=False, default='results.json', help='Output file name. Default: results.json')
+    parser.add_argument('-o', dest='fn', required=False, default='results.json', help='Output file name. Default: results.json')
     parser.add_argument('-d', dest='path', required=False, default=False, help="Absolute path to the downloaded HTML file")
     parser.add_argument('-p', dest='process', required=False, default=1, type=int, help='How many processes to execute')
     parser.add_argument('--dnsdumpster', action='store_true', required=False, default=False, help='Use the DNSDumpster API to gather DBs')
+    parser.add_argument('--just-v', action='store_true', required=False, default=False, help='Ignore non-vulnerable DBs')
+    parser.add_argument('--amass', dest='amass', required=False, default=False, help='Path to the output file of an amass scan ([-o] argument)')
+    
+    if len(sys.argv) == 1:
+        parser.error("No arguments supplied.")
+        sys.exit()
+
     return parser.parse_args()
 
 
@@ -35,7 +43,7 @@ def worker(url):
     Main function in charge of the bulk of the crawling, it assess a status to
     each DB depending on the response.
     '''
-    print('Crawling {}...'.format(url))
+    print('Crawling {} ...'.format(url))
     sleep(0.5) #a bit of delay to not abuse in excess the servers
     try:
         r = requests.get(url).json()
@@ -44,19 +52,20 @@ def worker(url):
     
     try:
         if 'error' in r.keys():
-            if r['error'] == 'Permission denied':
-                return {'status':-1, 'url': url} #successfully protected
-            elif r['error'] == '404 Not Found':
-                return {'status':-2, 'url':url} #doesn't exist
-            else:
-                return {'status':0, 'url': url, 'data':r} #maybe there's a chance for further explotiation
+            if r['error'] == 'Permission denied' and not args_.just_v:
+                return {'status':-2, 'url':url} #successfully protected
+            elif r['error'] == '404 Not Found' and not args_.just_v:
+                return {'status':-1, 'url':url} #doesn't exist
+            elif not args_.just_v:
+                return {'status':0, 'url':url} #maybe there's a chance for further explotiation
         else:
             return {'status':1, 'url':url, 'data':r} #vulnerable
     except AttributeError:
         '''
         Some DBs may just return null
         '''
-        return {'status':0, 'url':url, 'data':r}
+        if not args_.just_v:
+            return {'status':0, 'url':url}
 
 
 def load_file():
@@ -110,27 +119,46 @@ def tops():
     return top_doms
 
 
+def amass():
+    '''
+    From an amass scan output file([-o] argument), gather the DBs urls to crawl.
+    '''
+    with open(args_.amass) as f:
+        dbs = ['https://{}/.json'.format(line.rstrip()) for line in f]
+    
+    return dbs
+
+
+def dns_dumpster():
+    from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
+
+    print('Gathering subdomains using DNSDumpster...')
+    results = DNSDumpsterAPI().search('firebaseio.com')
+    
+    return [domain['domain'] for domain in results['dns_records']['host']]
+        
+
 if __name__ == '__main__':
     args_ = args()
     if not args_.list:
-        domains = []
+        dbs = []
+
         if args_.dnsdumpster:
-            from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
+           dbs.extend(dns_dumpster())
 
-            print('Gathering subdomains using DNSDumpster...')
-            results = DNSDumpsterAPI().search('firebaseio.com')
-            domains.extend([domain['domain'] for domain in results['dns_records']['host']])
-        
         if args_.path:
-            domains.extend(load_file())
+            dbs.extend(load_file())
 
-        urls = list(set(map(clean, domains)))
+        urls = list(set(map(clean, dbs)))
         if args_.crawl_top:
             urls.extend(tops())
 
+        if args_.amass:
+            urls.extend(amass())
+        
         print('\nLooting...')
         p = Pool(args_.process)
-        loot = list(p.map(worker, urls))
+        loot = [result for result in list(p.map(worker, urls)) if result != None]
 
     else:
         urls = set()
@@ -148,7 +176,7 @@ if __name__ == '__main__':
 
     l = {'1':0, '0':0, '-1':0, '-2':0}
     for result in loot:
-        l[str(result['status'])] +=1
+        l[str(result['status'])] += 1
 
     print('404 DBs:                 {}'.format(l['-2']))
     print('Secure DBs:              {}'.format(l['-1']))

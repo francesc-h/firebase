@@ -19,17 +19,19 @@ pip install -r requirements.txt
 
 ### Usage
 ```
-python3 firebase.py [-h] [--dnsdumpster] [-d /path/to/file.htm] [-f results.json] [-l /path/to/file] [-c 100] [-p 4]
+python3 firebase.py [-h] [--dnsdumpster] [-d /path/to/file.htm] [-o results.json] [-l /path/to/file] [-c 100] [-p 4]
 ```
 Arguments:
 ```
     -h      Show the help message
     -d      Absolute path to the downloaded HTML file.
-    -f      Output file name. Default: results.json
+    -o      Output file name. Default: results.json
     -c      Crawl for domains in the top-1m by Alexa. Set how many domains to crawl, for example: 100. Up to 1000000
     -p      How many processes to execute. Default: 1
     -l      Path to a file containing the DBs to crawl. One DB name per line. This option can't be used with -d or -c
     --dnsdumpster       Use the DNSDumpster API to gather DBs
+    --just-v    Ignore "non-vulnerable" DBs
+    --amass Path of the output file of an amass scan ([-o] argument)
 ```
 
 Example:
@@ -50,7 +52,7 @@ twitter
 microsoft
 ```
 
-Using that file will check for these DBs: ```https://airbnb.firebaseio.com, https://twitter.firebaseio.com, https://microsoft.firebaseio.com```
+Using that file will check for these DBs: ```https://airbnb.firebaseio.com/.json, https://twitter.firebaseio.com/.json, https://microsoft.firebaseio.com/.json```
 
 ### Credits
 
