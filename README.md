@@ -45,6 +45,8 @@ The script will create a json file containing the gathered vulnerable databases 
 
 For a better results head to [pentest-tools.com](https://pentest-tools.com/information-gathering/find-subdomains-of-domain) and in its subdomain scanner introduce the following domain: ```firebaseio.com```. Once the scan has finished, save the page HTML(CRL+S) and use the ```-d [path]``` argument, this will allow the script to analyze the subdomains discovered by that service. Further subdomain crawlers might get supported.
 
+Now we support the [amass](https://github.com/caffix/amass) scanner by @caffix! By running any desired scann with that tool against ``firebaseio.com`` using the ``-o`` argument, the script will be able to digest the output file and crawl for the discovered DBs.
+
 Firebase DBs work using this structure: ```https://[DB name].firebaseio.com/```. If you are using the ```-l [path]``` argument, the supplied file needs to contain a [DB name] per line, for example:
 ```
 airbnb
